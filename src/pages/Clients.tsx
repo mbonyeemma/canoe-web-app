@@ -25,8 +25,6 @@ interface Client {
   conditions: string[];
 }
 
-function apptId(a: Appointment) { return a.appointment_id || a.id || ''; }
-
 function deriveClients(appointments: Appointment[]): Client[] {
   const map: Record<string, Client> = {};
   for (const a of appointments) {

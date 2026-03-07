@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Video, Phone, Search, Check, X, ChevronRight, User } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -59,6 +59,7 @@ function filterByTab(list: Appointment[], tab: Tab): Appointment[] {
 }
 
 export default function Appointments() {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [tab, setTab] = useState<Tab>('pending');
   const [search, setSearch] = useState('');
@@ -111,10 +112,14 @@ export default function Appointments() {
       const res = await api.parseResponse<{ data?: { url?: string; join_url?: string; meeting_id?: string } }>(
         await api.post(`/appointments/${id}/join-call`, {})
       );
-      const url = res.data?.url || res.data?.join_url;
-      if (url) { window.open(url, '_blank'); }
-      else if (res.data?.meeting_id) { window.open(`https://meet.jit.si/${res.data.meeting_id}`, '_blank'); }
-      else { toast.error('No call URL received'); }
+      const meetingId = res.data?.meeting_id;
+      if (meetingId) {
+        navigate(`/call/${meetingId}`);
+      } else {
+        const url = res.data?.url || res.data?.join_url;
+        if (url) { window.open(url, '_blank'); }
+        else { toast.error('No call URL received'); }
+      }
     } catch (err: any) { toast.error(err?.message || 'Failed to start call'); }
     finally { setActionLoading(null); }
   };

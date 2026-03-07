@@ -47,15 +47,13 @@ export default function App() {
         <Route path="/personal-details" element={<PersonalDetails />} />
       </Route>
 
-      {/* Full-screen video/voice call — no sidebar */}
-      <Route element={<ProtectedRoute><></></ProtectedRoute>}>
-        <Route path="/call/:meetingId" element={<VideoCall />} />
-      </Route>
-
       {/* Protected provider dashboard */}
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/home" element={<Navigate to="/dashboard" replace />} />
+
+        {/* Video / voice calls (full-screen overlay, covers the sidebar via fixed+z-50) */}
+        <Route path="/call/:meetingId" element={<VideoCall />} />
 
         {/* Appointments */}
         <Route path="/appointments" element={<Appointments />} />

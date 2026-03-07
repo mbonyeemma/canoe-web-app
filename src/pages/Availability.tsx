@@ -41,7 +41,7 @@ export default function Availability() {
         const avail = res.data?.availability || [];
         if (avail.length > 0) {
           setDays((prev) => {
-            const next = prev.map((d) => ({ ...d, slots: [] }));
+            const next = prev.map((d) => ({ ...d, slots: [] as TimeSlot[] }));
             for (const slot of avail) {
               const idx = slot.day_of_week;
               if (idx >= 0 && idx < 7) {
@@ -54,7 +54,7 @@ export default function Availability() {
             // Ensure each available day has at least one slot
             for (let i = 0; i < 7; i++) {
               if (next[i].available && next[i].slots.length === 0) {
-                next[i].slots = [{ start_time: '08:00', end_time: '17:00' }];
+                next[i].slots = [{ start_time: '08:00', end_time: '17:00' }] as TimeSlot[];
               }
             }
             return next;
