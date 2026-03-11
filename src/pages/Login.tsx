@@ -4,7 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
-import api, { parseResponse } from '../services/api';
+import api from '../services/api';
 
 export default function Login() {
   const { login, refreshProfile } = useAuth();
