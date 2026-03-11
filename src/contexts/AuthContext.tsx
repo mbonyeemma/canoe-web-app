@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const res = await api.get('/auth/profile');
+      const res = await api.get('/auth/user-profile');
       const result = await api.parseResponse<{ data?: UserProfile }>(res);
       if (result.data) {
         setUser(result.data);
