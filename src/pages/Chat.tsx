@@ -4,6 +4,13 @@ import { ArrowLeft, Send, Paperclip, Video, Phone, Smile } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  type CallType,
+  sanitizeRoom,
+  generateRoomId,
+  buildCallUrl,
+  extractMeetingFromUrl,
+} from '../utils/meetings';
 
 interface Message {
   id: string;
@@ -21,8 +28,6 @@ interface Message {
   is_read?: boolean;
 }
 
-type CallType = 'video' | 'audio';
-
 interface CallInvite {
   type: CallType;
   url: string;
@@ -38,22 +43,6 @@ const COMMON_EMOJIS = [
   '😡', '👍', '👎', '🙏', '👏', '👌', '✌️', '🤝', '❤️', '💔',
 ];
 
-function sanitizeRoom(input: string): string {
-  return input
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-zA-Z0-9-_]/g, '')
-    .slice(0, 128);
-}
-
-function generateRoomId(): string {
-  try {
-    return globalThis.crypto.randomUUID().replace(/-/g, '');
-  } catch {
-    return `room-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  }
-}
-
 function extractFirstUrl(text: string): string | null {
   if (!text) return null;
   const match = text.match(URL_REGEX);
@@ -63,42 +52,19 @@ function extractFirstUrl(text: string): string | null {
   return raw;
 }
 
-function parseMeetingFromUrl(url: string): { meetingId?: string; appointmentId?: string; audioOnly?: boolean } {
-  try {
-    const full = url.startsWith('http') ? url : `${window.location.origin}${url}`;
-    const u = new URL(full);
-    const path = u.pathname || '';
-    const parts = path.split('/').filter(Boolean);
-    let meetingId: string | undefined;
-    if (path.startsWith('/call/') && parts.length >= 2) {
-      meetingId = decodeURIComponent(parts[1]);
-    } else if (/meet\.jit\.si/i.test(u.hostname) && parts.length >= 1) {
-      meetingId = decodeURIComponent(parts[0]);
-    }
-    const params = u.searchParams;
-    const appointmentId = params.get('appointmentId') || undefined;
-    const audioOnly = params.get('audioOnly') === 'true';
-    return { meetingId, appointmentId, audioOnly };
-  } catch {
-    return {};
-  }
-}
-
 function parseCallInviteFromMessage(msg: Message): CallInvite | null {
   const base = msg.content || msg.message || msg.text || '';
   if (!base) return null;
 
   const url = extractFirstUrl(base);
   if (!url) return null;
-  if (!url.includes('/call/') && !/meet\.jit\.si/i.test(url)) {
-    return null;
-  }
 
   const lower = base.toLowerCase();
   const isAudio = lower.includes('audio call') || lower.includes('voice call');
   const type: CallType = isAudio ? 'audio' : 'video';
 
-  const { meetingId, appointmentId } = parseMeetingFromUrl(url);
+  const { meetingId, appointmentId } = extractMeetingFromUrl(url);
+  if (!meetingId) return null;
 
   let scheduledForLabel: string | undefined;
   const scheduledRaw = msg.metadata?.scheduled_for;
@@ -201,6 +167,15 @@ export default function Chat() {
     setText((prev) => `${prev}${emoji}`);
   };
 
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setEmojiOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [emojiOpen]);
+
   const openSchedule = (mode: CallType) => {
     setScheduleMode(mode);
     if (!scheduledDate) {
@@ -242,9 +217,7 @@ export default function Chat() {
       : `${scheduledDate} ${scheduledTime}`;
 
     const sendInvite = async (roomId: string) => {
-      const qs = audioOnly ? '?audioOnly=true' : '';
-      const joinPath = `/call/${encodeURIComponent(roomId)}${qs}`;
-      const callUrl = `${window.location.origin}${joinPath}`;
+      const callUrl = buildCallUrl(roomId, { audioOnly });
       const content = `${audioOnly ? 'Audio' : 'Video'} call scheduled on ${whenLabel}.\nJoin: ${callUrl}`;
       await api.parseResponse(
         await api.post(`/chat/${id}/messages`, {

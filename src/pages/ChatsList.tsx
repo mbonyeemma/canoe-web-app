@@ -9,6 +9,8 @@ interface Chat {
   other_user_pic?: string;
   last_message?: string;
   last_message_time?: string;
+  last_message_content?: string | null;
+  time_last_sent_message?: string | null;
   unread_count?: number;
   is_ai?: boolean;
 }
@@ -56,6 +58,8 @@ export default function ChatsList() {
           {filtered.map((c) => {
             const pic = api.getProfilePicUrl(c.other_user_pic);
             const name = c.other_user_name || (c.is_ai ? 'Canoe AI' : 'Chat');
+            const lastMsg = c.last_message || c.last_message_content || '';
+            const lastTime = c.last_message_time || c.time_last_sent_message || undefined;
             return (
               <Link key={c.conversation_id} to={`/chats/${c.conversation_id}`} state={{ name }} className="flex items-center gap-3 bg-white rounded-xl p-4 hover:bg-gray-50 transition">
                 {pic ? (
@@ -66,9 +70,9 @@ export default function ChatsList() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-gray-900 truncate">{name}</p>
-                    <span className="text-xs text-gray-400 shrink-0">{formatTime(c.last_message_time)}</span>
+                    <span className="text-xs text-gray-400 shrink-0">{formatTime(lastTime)}</span>
                   </div>
-                  <p className="text-sm text-gray-500 truncate">{c.last_message || 'Start a conversation'}</p>
+                  <p className="text-sm text-gray-500 truncate">{lastMsg || 'Start a conversation'}</p>
                 </div>
                 {(c.unread_count || 0) > 0 && (
                   <span className="bg-primary text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">{c.unread_count}</span>

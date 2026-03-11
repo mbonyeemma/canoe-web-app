@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Video, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
+import { buildCallUrl } from '../utils/meetings';
 
 export default function BookAppointment() {
   const { id } = useParams<{ id: string }>();
@@ -48,11 +49,7 @@ export default function BookAppointment() {
 
           if (conversationId) {
             const roomId = `appointment-${apptId}`;
-            const qs = '';
-            const joinPath = `/call/${encodeURIComponent(roomId)}${qs}`;
-            const callUrl = `${window.location.origin}${joinPath}?appointmentId=${encodeURIComponent(
-              String(apptId),
-            )}`;
+            const callUrl = buildCallUrl(roomId, { appointmentId: String(apptId) });
             const whenLabel = `${form.date} ${form.time}`;
             const content = `Video appointment scheduled on ${whenLabel}.\nJoin: ${callUrl}`;
             await api.parseResponse(

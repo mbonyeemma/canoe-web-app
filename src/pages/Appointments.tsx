@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Video, Phone, Search, Check, X, ChevronRight, User } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { joinAppointmentCall, resolveMeetingIdFromJoinUrl } from '../services/meetings';
 
 type Tab = 'pending' | 'today' | 'upcoming' | 'done';
 
@@ -109,16 +110,12 @@ export default function Appointments() {
     e.preventDefault();
     setActionLoading(id + '-call');
     try {
-      const res = await api.parseResponse<{ data?: { url?: string; join_url?: string; meeting_id?: string } }>(
-        await api.post(`/appointments/${id}/join-call`, {})
-      );
-      const meetingId = res.data?.meeting_id;
-      if (meetingId) {
-        navigate(`/call/${meetingId}`);
+      const { meetingId, joinUrl } = await joinAppointmentCall({ appointmentId: id });
+      const resolved = meetingId || (joinUrl ? resolveMeetingIdFromJoinUrl(joinUrl) : null);
+      if (resolved) {
+        navigate(`/call/${encodeURIComponent(resolved)}`);
       } else {
-        const url = res.data?.url || res.data?.join_url;
-        if (url) { window.open(url, '_blank'); }
-        else { toast.error('No call URL received'); }
+        toast.error('No meeting ID received');
       }
     } catch (err: any) { toast.error(err?.message || 'Failed to start call'); }
     finally { setActionLoading(null); }

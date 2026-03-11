@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Video, Users, MessageSquare, Wallet, ChevronRight, Check, X, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { joinAppointmentCall, resolveMeetingIdFromJoinUrl } from '../services/meetings';
 
 interface Stats {
   appointments_today: number;
@@ -48,6 +49,7 @@ function statusBadge(status: string) {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({ appointments_today: 0, pending_requests: 0 });
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [walletBalance, setWalletBalance] = useState<string | null>(null);
@@ -110,16 +112,12 @@ export default function Dashboard() {
     e.preventDefault();
     setActionLoading(id + '-call');
     try {
-      const res = await api.parseResponse<{ data?: { url?: string; join_url?: string; meeting_id?: string } }>(
-        await api.post(`/appointments/${id}/join-call`, {})
-      );
-      const url = res.data?.url || res.data?.join_url;
-      if (url) {
-        window.open(url, '_blank');
-      } else if (res.data?.meeting_id) {
-        window.open(`https://meet.jit.si/${res.data.meeting_id}`, '_blank');
+      const { meetingId, joinUrl } = await joinAppointmentCall({ appointmentId: id });
+      const resolved = meetingId || (joinUrl ? resolveMeetingIdFromJoinUrl(joinUrl) : null);
+      if (resolved) {
+        navigate(`/call/${encodeURIComponent(resolved)}`);
       } else {
-        toast.error('No call URL received');
+        toast.error('No meeting ID received');
       }
     } catch (err: any) {
       toast.error(err?.message || 'Failed to start call');

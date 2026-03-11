@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Users, MessageCircle, Wallet, User, LogOut, Menu, X, Settings, Clock, ChevronRight } from 'lucide-react';
+import { Home, Calendar, Users, MessageCircle, Wallet, User, LogOut, Menu, X, Settings, Clock, ChevronRight, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
@@ -20,6 +20,8 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement | null>(null);
 
   // Keep scrolling inside the main content area, not the whole page.
   useEffect(() => {
@@ -39,6 +41,17 @@ export default function DashboardLayout() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const el = notifRef.current;
+      if (!el) return;
+      if (!el.contains(e.target as Node)) setNotifOpen(false);
+    };
+    window.addEventListener('mousedown', onDown);
+    return () => window.removeEventListener('mousedown', onDown);
+  }, [notifOpen]);
 
   const toggleAvailability = async () => {
     const next = !isAvailable;
@@ -126,19 +139,42 @@ export default function DashboardLayout() {
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
           <div className="hidden lg:block" />
-          <NavLink to="/profile" className="flex items-center gap-2.5 hover:opacity-80">
-            {profilePic ? (
-              <img src={profilePic} alt="" className="w-8 h-8 rounded-full object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">
-                {user?.first_name?.[0] || 'P'}
-              </div>
-            )}
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-gray-800 leading-tight">{user?.first_name || 'Provider'}</p>
-              <p className="text-[10px] text-gray-400 leading-tight">Provider</p>
+          <div className="flex items-center gap-3">
+            <div ref={notifRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setNotifOpen((v) => !v)}
+                className="p-2 rounded-lg hover:bg-gray-50 transition text-gray-600"
+                aria-label="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+              </button>
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 shadow-lg rounded-xl overflow-hidden z-50">
+                  <div className="px-3.5 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">Notifications</p>
+                  </div>
+                  <div className="px-3.5 py-8 text-center">
+                    <p className="text-sm text-gray-500">No notifications yet.</p>
+                  </div>
+                </div>
+              )}
             </div>
-          </NavLink>
+
+            <NavLink to="/profile" className="flex items-center gap-2.5 hover:opacity-80">
+              {profilePic ? (
+                <img src={profilePic} alt="" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center text-sm font-bold">
+                  {user?.first_name?.[0] || 'P'}
+                </div>
+              )}
+              <div className="hidden sm:block">
+                <p className="text-sm font-semibold text-gray-800 leading-tight">{user?.first_name || 'Provider'}</p>
+                <p className="text-[10px] text-gray-400 leading-tight">Provider</p>
+              </div>
+            </NavLink>
+          </div>
         </header>
 
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">

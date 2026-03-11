@@ -15,6 +15,9 @@ import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
 
 import VideoCall from './pages/VideoCall';
+import FindDoctors from './pages/FindDoctors';
+import DoctorDetails from './pages/DoctorDetails';
+import BookAppointment from './pages/BookAppointment';
 import Dashboard from './pages/Dashboard';
 import Appointments from './pages/Appointments';
 import AppointmentDetails from './pages/AppointmentDetails';
@@ -39,6 +42,9 @@ export default function App() {
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/doctors" element={<FindDoctors />} />
+      <Route path="/doctors/:id" element={<DoctorDetails />} />
+      <Route path="/doctors/:id/book" element={<BookAppointment />} />
 
       {/* Auth pages */}
       <Route element={<AuthLayout />}>

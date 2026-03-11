@@ -3,9 +3,9 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import { useAuth } from '../contexts/AuthContext';
 import { Phone } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../services/api';
-
-const JITSI_DOMAIN = 'meet.canoehealthcare.com';
+import { JITSI_DOMAIN } from '../config/jitsi';
 
 export default function VideoCall() {
   const { meetingId } = useParams<{ meetingId: string }>();
@@ -24,6 +24,7 @@ export default function VideoCall() {
       })
       .catch(() => {
         setJwt(null);
+        toast.error('Could not authorize the meeting. Please refresh and try again.');
       });
   }, [meetingId]);
 
