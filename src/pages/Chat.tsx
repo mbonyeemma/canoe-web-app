@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Send, Paperclip, Video, Phone } from 'lucide-react';
+import { ArrowLeft, Send, Paperclip, Video, Phone, Smile } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -18,6 +18,7 @@ interface Message {
     scheduled_for?: string;
     appointment_id?: string;
   };
+  is_read?: boolean;
 }
 
 type CallType = 'video' | 'audio';
@@ -31,6 +32,11 @@ interface CallInvite {
 }
 
 const URL_REGEX = /(https?:\/\/[^\s]+|www\.[^\s]+|\/call\/[^\s]+)/i;
+
+const COMMON_EMOJIS = [
+  '😀', '😁', '😂', '🤣', '😊', '😍', '🥰', '😘', '😎', '😢',
+  '😡', '👍', '👎', '🙏', '👏', '👌', '✌️', '🤝', '❤️', '💔',
+];
 
 function sanitizeRoom(input: string): string {
   return input
@@ -153,6 +159,7 @@ export default function Chat() {
   const [scheduleMode, setScheduleMode] = useState<CallType | null>(null);
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
@@ -188,6 +195,10 @@ export default function Chat() {
       if (id) fetchMessages(id);
     } catch { }
     setSending(false);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setText((prev) => `${prev}${emoji}`);
   };
 
   const openSchedule = (mode: CallType) => {
@@ -268,6 +279,18 @@ export default function Chat() {
     if (!ts) return '';
     return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
   };
+
+  // Mark all messages from the other user as read once loaded
+  useEffect(() => {
+    if (!id || !messages.length || !user?.user_id) return;
+    const unreadIds = messages
+      .filter((m) => m.sender_id && m.sender_id !== user.user_id && !m.is_read)
+      .map((m) => m.id);
+    if (!unreadIds.length) return;
+    api
+      .post(`/chat/${id}/messages/read`, { message_ids: unreadIds })
+      .catch(() => {});
+  }, [id, messages, user?.user_id]);
 
   return (
     <div className="w-full flex flex-col h-[calc(100vh-7rem)]">
@@ -457,8 +480,17 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3 shrink-0">
-        <button className="text-gray-400 hover:text-primary"><Paperclip className="w-5 h-5" /></button>
+      <div className="relative bg-white border-t border-gray-200 px-4 py-3 flex items-center gap-3 shrink-0">
+        <button className="text-gray-400 hover:text-primary">
+          <Paperclip className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setEmojiOpen((open) => !open)}
+          className={`text-gray-400 hover:text-primary transition ${emojiOpen ? 'text-primary' : ''}`}
+        >
+          <Smile className="w-5 h-5" />
+        </button>
         <input
           type="text"
           value={text}
@@ -467,9 +499,28 @@ export default function Chat() {
           placeholder="Type a message..."
           className="flex-1 bg-surface rounded-full px-4 py-2 text-sm outline-none"
         />
-        <button onClick={handleSend} disabled={!text.trim() || sending} className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark transition disabled:opacity-40">
+        <button
+          onClick={handleSend}
+          disabled={!text.trim() || sending}
+          className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark transition disabled:opacity-40"
+        >
           <Send className="w-4 h-4" />
         </button>
+
+        {emojiOpen && (
+          <div className="absolute bottom-14 left-12 z-20 bg-white border border-gray-200 rounded-xl shadow-lg p-2 flex flex-wrap max-w-xs">
+            {COMMON_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => handleEmojiSelect(emoji)}
+                className="w-8 h-8 flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
