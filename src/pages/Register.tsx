@@ -22,12 +22,9 @@ export default function Register() {
         <div className="relative z-10">
           <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.18em] mb-3">Get started</p>
           <h2 className="text-[28px] font-bold text-white leading-[1.2] whitespace-pre-line">
-            Tell us how you&apos;ll\nuse Canoe Health
+            Tell us how you will use Canoe Health
           </h2>
-          <p className="text-white/60 text-sm mt-3 leading-relaxed max-w-[280px]">
-            Whether you&apos;re a client looking for care or a provider offering consultations, Canoe Health keeps
-            everything in one secure place.
-          </p>
+        
 
           <div className="mt-7 space-y-2.5">
             <div className="flex items-center gap-3">
@@ -91,9 +88,7 @@ export default function Register() {
               <h2 className="text-lg font-bold text-gray-900 group-hover:text-primary transition">
                 Register as a client
               </h2>
-              <p className="text-sm text-gray-600 mt-1.5">
-                Book appointments, chat with providers, and manage your health.
-              </p>
+              
               <div className="mt-5 inline-flex items-center text-sm font-semibold text-primary">
                 Continue →
               </div>
@@ -109,9 +104,7 @@ export default function Register() {
               <h2 className="text-lg font-bold text-gray-900 group-hover:text-primary transition">
                 Register as a provider
               </h2>
-              <p className="text-sm text-gray-600 mt-1.5">
-                Offer telemedicine consultations and get paid securely.
-              </p>
+             
               <div className="mt-5 inline-flex items-center text-sm font-semibold text-primary">
                 Continue →
               </div>
