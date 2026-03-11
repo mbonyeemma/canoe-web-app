@@ -67,7 +67,10 @@ async function request(method: string, path: string, body?: unknown, opts: Reque
   }
 
   const res = await fetch(url, config);
-  if (res.status === 401 && useAuth && headers.Authorization) {
+  // Only clear the local session for 401s coming from auth endpoints.
+  // Other modules (e.g. feature flags, role-based APIs) might legitimately return 401/403
+  // without meaning that the whole user session is invalid.
+  if (res.status === 401 && useAuth && headers.Authorization && path.replace(/^\//, '').startsWith('auth/')) {
     clearSession();
   }
   return res;

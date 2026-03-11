@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Key, FileText, Shield, Phone, Trash2, LogOut, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Key, FileText, Shield, Phone, Trash2, LogOut, ChevronRight, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -20,13 +20,14 @@ export default function SettingsPage() {
 
   const items = [
     { to: '/settings/password', icon: Key, label: 'Change Password' },
+    { to: '/settings/payment-methods', icon: CreditCard, label: 'Payment methods' },
     { to: '/terms', icon: FileText, label: 'Terms of Service' },
     { to: '/privacy', icon: Shield, label: 'Privacy Policy' },
     { to: '/contact', icon: Phone, label: 'Contact Us' },
   ];
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary mb-6">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>

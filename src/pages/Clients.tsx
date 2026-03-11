@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, User, Calendar, ChevronRight, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, User, Calendar } from 'lucide-react';
 import api from '../services/api';
 
 interface Appointment {
@@ -62,6 +62,7 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default function Clients() {
+  const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -82,7 +83,7 @@ export default function Clients() {
     : clients;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -115,72 +116,62 @@ export default function Clients() {
         </div>
       ) : (
         <>
-          {/* Table header (desktop) */}
-          <div className="hidden md:grid grid-cols-12 gap-4 px-4 mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-            <div className="col-span-4">Patient</div>
-            <div className="col-span-3">Last Visit</div>
-            <div className="col-span-2 text-center">Consultations</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-1" />
-          </div>
-
-          <div className="space-y-2">
-            {filtered.map((client) => {
-              const status = (client.lastStatus || '').toLowerCase();
-              const pic = api.getProfilePicUrl(client.pic);
-              return (
-                <Link
-                  key={client.id}
-                  to={`/clients/${encodeURIComponent(client.id)}`}
-                  className="flex md:grid md:grid-cols-12 items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3.5 hover:shadow-md hover:border-primary/20 transition"
-                >
-                  {/* Avatar + Name */}
-                  <div className="col-span-4 flex items-center gap-3 min-w-0">
-                    {pic ? (
-                      <img src={pic} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold shrink-0">
-                        {client.name[0]}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate text-sm">{client.name}</p>
-                      {client.conditions[0] && (
-                        <p className="text-xs text-gray-400 truncate">{client.conditions[0]}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Last visit */}
-                  <div className="col-span-3 hidden md:flex items-center gap-1.5 text-sm text-gray-500">
-                    <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                    {client.lastVisit || 'Never'}
-                  </div>
-
-                  {/* Total */}
-                  <div className="col-span-2 hidden md:flex items-center justify-center">
-                    <span className="text-sm font-bold text-gray-700">{client.totalAppointments}</span>
-                  </div>
-
-                  {/* Status */}
-                  <div className="col-span-2 hidden md:flex items-center">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize ${STATUS_BADGE[status] || 'bg-gray-100 text-gray-600'}`}>
-                      {status.replace('_', ' ') || 'N/A'}
-                    </span>
-                  </div>
-
-                  {/* Mobile summary */}
-                  <div className="md:hidden flex-1 text-right">
-                    <span className="text-xs text-gray-400 flex items-center gap-1 justify-end">
-                      <Clock className="w-3 h-3" />{client.lastVisit || 'Never'}
-                    </span>
-                    <span className="text-xs text-gray-500 font-medium">{client.totalAppointments} visits</span>
-                  </div>
-
-                  <ChevronRight className="w-4 h-4 text-gray-300 col-span-1 shrink-0" />
-                </Link>
-              );
-            })}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-surface">
+                  <tr className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    <th className="text-left px-5 py-3.5">Patient</th>
+                    <th className="text-left px-5 py-3.5">Last Visit</th>
+                    <th className="text-center px-5 py-3.5">Consultations</th>
+                    <th className="text-left px-5 py-3.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filtered.map((client) => {
+                    const status = (client.lastStatus || '').toLowerCase();
+                    const pic = api.getProfilePicUrl(client.pic);
+                    return (
+                      <tr
+                        key={client.id}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => navigate(`/clients/${encodeURIComponent(client.id)}`)}
+                      >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {pic ? (
+                              <img src={pic} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold shrink-0">
+                                {client.name[0]}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="font-semibold text-gray-900 truncate">{client.name}</p>
+                              {client.conditions[0] ? (
+                                <p className="text-xs text-gray-400 truncate">{client.conditions[0]}</p>
+                              ) : null}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-gray-600">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                            {client.lastVisit || 'Never'}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-center font-bold text-gray-700">{client.totalAppointments}</td>
+                        <td className="px-5 py-4">
+                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full capitalize ${STATUS_BADGE[status] || 'bg-gray-100 text-gray-600'}`}>
+                            {status.replace('_', ' ') || 'N/A'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}

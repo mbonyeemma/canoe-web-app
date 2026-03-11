@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Register from './pages/Register';
 import OtpVerify from './pages/OtpVerify';
 import PersonalDetails from './pages/PersonalDetails';
 import Terms from './pages/Terms';
@@ -28,6 +29,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Settings from './pages/Settings';
 import ChangePassword from './pages/ChangePassword';
+import SettingsPaymentMethods from './pages/SettingsPaymentMethods';
 
 export default function App() {
   return (
@@ -42,7 +44,7 @@ export default function App() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/register" element={<Navigate to="/signup" replace />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<OtpVerify />} />
         <Route path="/personal-details" element={<PersonalDetails />} />
       </Route>
@@ -79,6 +81,7 @@ export default function App() {
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/password" element={<ChangePassword />} />
+        <Route path="/settings/payment-methods" element={<SettingsPaymentMethods />} />
       </Route>
 
       {/* 404 */}

@@ -36,6 +36,37 @@ export default function BookAppointment() {
       const result = await api.parseResponse<{ data?: any }>(res);
       const apptId = result.data?.appointment_id || result.data?.id;
       toast.success('Appointment booked!');
+
+      // If this is an online visit and we know the provider's user_id, send a call invite into chat
+      if (apptId && form.visit_type === 'online' && doctor?.user_id) {
+        try {
+          // Ensure there is a conversation between this patient (current user) and the provider
+          const convRes = await api.post('/chat/conversation', { user2_id: doctor.user_id });
+          const convResult = await api.parseResponse<{ data?: any }>(convRes);
+          const conversationId =
+            convResult.data?.conversation_id || convResult.data?.conversationId;
+
+          if (conversationId) {
+            const roomId = `appointment-${apptId}`;
+            const qs = '';
+            const joinPath = `/call/${encodeURIComponent(roomId)}${qs}`;
+            const callUrl = `${window.location.origin}${joinPath}?appointmentId=${encodeURIComponent(
+              String(apptId),
+            )}`;
+            const whenLabel = `${form.date} ${form.time}`;
+            const content = `Video appointment scheduled on ${whenLabel}.\nJoin: ${callUrl}`;
+            await api.parseResponse(
+              await api.post(`/chat/${conversationId}/messages`, {
+                content,
+                message_type: 'call',
+              }),
+            );
+          }
+        } catch {
+          // Non-critical: booking succeeded even if chat invite fails
+        }
+      }
+
       navigate(apptId ? `/appointments/${apptId}` : '/appointments');
     } catch (err: any) {
       toast.error(err?.message || 'Failed to book');
@@ -47,7 +78,7 @@ export default function BookAppointment() {
   const name = doctor?.full_name || `${doctor?.first_name || ''} ${doctor?.last_name || ''}`.trim() || 'Doctor';
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary mb-6">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>

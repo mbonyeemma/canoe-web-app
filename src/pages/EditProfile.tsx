@@ -41,7 +41,7 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary mb-6">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>

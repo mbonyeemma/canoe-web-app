@@ -137,7 +137,7 @@ export default function Profile() {
   const inp = 'w-full px-4 py-2.5 text-sm border-2 border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/15 outline-none transition bg-white';
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="w-full">
       {/* Profile Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5">
         <div className="flex items-start gap-5">

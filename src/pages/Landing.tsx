@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Apple, Play, ChevronDown, Smartphone, Menu, X } from 'lucide-react';
+import { Apple, Play, Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Features', to: '#features' },
@@ -11,21 +11,7 @@ const NAV_LINKS = [
 const FOREST_GREEN = '#2E6F4F';
 
 export default function Landing() {
-  const [getStartedOpen, setGetStartedOpen] = useState(false);
-  const [getAppOpen, setGetAppOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const getStartedRef = useRef<HTMLDivElement>(null);
-  const getAppRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (getStartedRef.current && !getStartedRef.current.contains(target)) setGetStartedOpen(false);
-      if (getAppRef.current && !getAppRef.current.contains(target)) setGetAppOpen(false);
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: FOREST_GREEN }}>
@@ -50,50 +36,18 @@ export default function Landing() {
 
           {/* CTA buttons - desktop */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            {/* Get the App dropdown */}
-            <div className="relative" ref={getAppRef}>
-              <button
-                onClick={() => { setGetAppOpen(!getAppOpen); setGetStartedOpen(false); }}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold border-2 border-primary text-primary px-4 py-2.5 rounded-full hover:bg-primary-light transition"
-              >
-                <Smartphone className="w-4 h-4" />
-                Get the App <ChevronDown className={`w-4 h-4 transition-transform ${getAppOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {getAppOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-3 z-50">
-                  <p className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Download the app</p>
-                  <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
-                    <Apple className="w-5 h-5 text-gray-700" />
-                    <span className="text-sm font-medium">App Store</span>
-                  </a>
-                  <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
-                    <Play className="w-5 h-5 text-gray-700" />
-                    <span className="text-sm font-medium">Google Play</span>
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Get Started dropdown */}
-            <div className="relative" ref={getStartedRef}>
-              <button
-                onClick={() => { setGetStartedOpen(!getStartedOpen); setGetAppOpen(false); }}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold bg-primary text-white px-5 py-2.5 rounded-full hover:bg-primary-dark transition"
-              >
-                Get Started <ChevronDown className={`w-4 h-4 transition-transform ${getStartedOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {getStartedOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                  <p className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Providers</p>
-                  <Link to="/signup" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition">Sign up</Link>
-                  <Link to="/login" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition">Sign in</Link>
-                  <div className="border-t border-gray-100 my-1" />
-                  <p className="px-4 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Clients</p>
-                  <Link to="/login" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition">Sign in</Link>
-                  <Link to="/signup" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition">Sign up</Link>
-                </div>
-              )}
-            </div>
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold bg-primary text-white px-5 py-2.5 rounded-full hover:bg-primary-dark transition"
+            >
+              Get started
+            </Link>
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold border-2 border-primary text-primary px-4 py-2.5 rounded-full hover:bg-primary-light transition"
+            >
+              Sign in
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -115,14 +69,8 @@ export default function Landing() {
               </Link>
             ))}
             <div className="pt-3 border-t border-gray-100 space-y-2">
-              <a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 py-2 text-sm font-medium text-gray-700 hover:text-primary">
-                <Apple className="w-4 h-4" /> App Store
-              </a>
-              <a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 py-2 text-sm font-medium text-gray-700 hover:text-primary">
-                <Play className="w-4 h-4" /> Google Play
-              </a>
-              <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-semibold text-primary">Providers</Link>
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-semibold text-primary">Clients</Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-semibold text-primary">Get started</Link>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-semibold text-primary">Sign in</Link>
             </div>
           </div>
         )}

@@ -151,7 +151,7 @@ export default function AppointmentDetails() {
   const activeNote = NOTE_TABS.find((n) => n.key === notesTab)!;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       {/* Back */}
       <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary mb-5 transition">
         <ArrowLeft className="w-4 h-4" /> Back to Appointments

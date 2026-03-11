@@ -32,11 +32,17 @@ const SPECIALTIES = [
 
 const EXPERIENCE = ['< 1 yr', '1–3 yrs', '3–5 yrs', '5–10 yrs', '10+ yrs'];
 
-const STEPS = ['Your identity', 'Contact & location', 'Professional background', 'Security'];
+function getRoleFromUrl(): 'provider' | 'client' {
+  const role = new URLSearchParams(window.location.search).get('role')?.toLowerCase();
+  return role === 'client' ? 'client' : 'provider';
+}
+
+const PROVIDER_STEPS = ['Your identity', 'Contact & location', 'Professional background', 'Security'];
+const CLIENT_STEPS = ['Your identity', 'Contact & location', 'Security'];
 
 /* ─── Panel content per step ─────────────────────────── */
 
-const PANELS = [
+const PROVIDER_PANELS = [
   {
     label: 'Step 1 of 4',
     headline: 'Welcome to\nCanoe Health',
@@ -91,11 +97,58 @@ const PANELS = [
   },
 ];
 
+const CLIENT_PANELS = [
+  {
+    label: 'Step 1 of 3',
+    headline: 'Welcome to\nCanoe Health',
+    sub: 'Client Registration',
+    body: 'Book appointments, chat with providers, and manage your health — all from one place.',
+    items: [
+      { Icon: CalendarDays, text: 'Easy appointment booking' },
+      { Icon: Video,       text: 'Video, phone & chat consultations' },
+      { Icon: ShieldCheck, text: 'Privacy-first care' },
+    ],
+    gradient: 'from-[#1B5E20] via-[#256829] to-[#2E7D32]',
+  },
+  {
+    label: 'Step 2 of 3',
+    headline: 'Stay connected\nwith your care',
+    sub: 'Contact & Location',
+    body: 'Add your phone number so you can receive verification codes and appointment updates.',
+    items: [
+      { flag: '🇺🇬', text: 'Uganda'   },
+      { flag: '🇰🇪', text: 'Kenya'    },
+      { flag: '🇹🇿', text: 'Tanzania' },
+      { flag: '🇷🇼', text: 'Rwanda'   },
+      { flag: '🇬🇭', text: 'Ghana'    },
+      { flag: '🇳🇬', text: 'Nigeria'  },
+    ] as { flag: string; text: string }[],
+    gradient: 'from-[#1a6b2e] via-[#2a8038] to-[#3daa4a]',
+    useFlags: true,
+  },
+  {
+    label: 'Step 3 of 3',
+    headline: 'Create your\nsecure account',
+    sub: 'Security',
+    body: 'Choose a strong password and accept the terms to finish registration.',
+    items: [
+      { Icon: Lock,       text: 'Secure sign-in' },
+      { Icon: ShieldCheck,text: 'Protected data' },
+      { Icon: Wallet,     text: 'Simple payments' },
+    ],
+    gradient: 'from-[#1B5E20] via-[#256829] to-[#34913a]',
+  },
+];
+
 /* ─── Component ──────────────────────────────────────── */
 
 export default function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
+  const role = getRoleFromUrl();
+  const isProvider = role === 'provider';
+  const STEPS = isProvider ? PROVIDER_STEPS : CLIENT_STEPS;
+  const PANELS = isProvider ? PROVIDER_PANELS : CLIENT_PANELS;
 
   const [step, setStep]         = useState(0);
   const [panelKey, setPanelKey] = useState(0);
@@ -128,7 +181,7 @@ export default function Signup() {
 
   const can0 = firstName.trim() && lastName.trim() && email.trim().includes('@');
   const can1 = phone.trim().length >= 6;
-  const can2 = licensed !== '' && hasCert !== '' && specialty !== '';
+  const can2 = !isProvider || (licensed !== '' && hasCert !== '' && specialty !== '');
   const can3 = password.length >= 8 && password === confirmPassword && agreedTerms && agreedAccurate && agreedVerify;
 
   const goStep = (s: number) => {
@@ -140,7 +193,7 @@ export default function Signup() {
   const next = () => {
     if (step === 0 && !can0) { toast.error('Fill in your name and email'); return; }
     if (step === 1 && !can1) { toast.error('Enter your phone number'); return; }
-    if (step === 2 && !can2) { toast.error('Complete all professional fields'); return; }
+    if (isProvider && step === 2 && !can2) { toast.error('Complete all professional fields'); return; }
     goStep(step + 1);
   };
 
@@ -159,11 +212,11 @@ export default function Signup() {
         password,
         phone: `${country.dial}${phone.trim().replace(/\D/g, '')}`,
         full_name: `${firstName.trim()} ${lastName.trim()}`,
-        role: 'provider',
+        role,
         agreed_to_terms: agreedTerms,
         iso_code: country.iso,
-        licensed: licensed === 'yes',
-        has_certificate: hasCert === 'yes',
+        licensed: isProvider ? licensed === 'yes' : undefined,
+        has_certificate: isProvider ? hasCert === 'yes' : undefined,
       });
       toast.success('Account created! Check your email or phone for the verification code.');
       navigate('/verify', { state: { phone: `${country.dial}${phone}` } });
@@ -248,8 +301,10 @@ export default function Signup() {
           </Link>
 
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-primary uppercase tracking-widest">Provider Registration</p>
-            <span className="text-xs text-gray-400">{step + 1} / 4</span>
+            <p className="text-xs font-semibold text-primary uppercase tracking-widest">
+              {isProvider ? 'Provider Registration' : 'Client Registration'}
+            </p>
+            <span className="text-xs text-gray-400">{step + 1} / {STEPS.length}</span>
           </div>
           <h1 className="text-xl font-bold text-gray-900 mt-1">{STEPS[step]}</h1>
 
@@ -282,7 +337,7 @@ export default function Signup() {
                 Get started <ChevronRight className="w-4 h-4" />
               </button>
               <p className="text-center text-xs text-gray-500">
-                Already a provider? <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
+                Already have an account? <Link to="/login" className="text-primary font-semibold hover:underline">Sign in</Link>
               </p>
             </div>
           )}
@@ -329,8 +384,8 @@ export default function Signup() {
             </div>
           )}
 
-          {/* ── Step 2: Professional ── */}
-          {step === 2 && (
+          {/* ── Step 2: Professional (provider only) ── */}
+          {isProvider && step === 2 && (
             <div key={`form-${formKey}`} className="form-step-in space-y-3.5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Medical specialty</label>
@@ -373,8 +428,8 @@ export default function Signup() {
             </div>
           )}
 
-          {/* ── Step 3: Security + Terms ── */}
-          {step === 3 && (
+          {/* ── Security + Terms (provider: step 3, client: step 2) ── */}
+          {((isProvider && step === 3) || (!isProvider && step === 2)) && (
             <form key={`form-${formKey}`} onSubmit={handleSubmit} className="form-step-in space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">

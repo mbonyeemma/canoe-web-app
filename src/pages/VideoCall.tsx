@@ -45,11 +45,37 @@ export default function VideoCall() {
             startScreenSharing: false,
             enableEmailInStats: false,
             prejoinPageEnabled: false,
+            // Keep layout simple and focused
+            toolbarButtons: [
+              'microphone',
+              'camera',
+              'desktop',     // screen share
+              'hangup',
+              'fullscreen',
+              'settings',
+            ],
+            // Simplify side UI
+            disableDeepLinking: true,
           }}
           interfaceConfigOverwrite={{
             DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
             MOBILE_APP_PROMO: false,
             SHOW_CHROME_EXTENSION_BANNER: false,
+            // Minimal toolbar similar to WhatsApp-style call controls
+            TOOLBAR_BUTTONS: [
+              'microphone',
+              'camera',
+              'desktop',
+              'hangup',
+              'fullscreen',
+              'settings',
+            ],
+            // Hide extra chrome
+            HIDE_INVITE_MORE_HEADER: true,
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_WATERMARK_FOR_GUESTS: false,
+            SHOW_BRAND_WATERMARK: false,
+            SHOW_POWERED_BY: false,
           }}
           userInfo={{
             displayName: user?.full_name || user?.email || 'Provider',

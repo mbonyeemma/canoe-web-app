@@ -38,7 +38,7 @@ export default function FindDoctors() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Find Doctors</h1>
         <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm w-full sm:w-72">

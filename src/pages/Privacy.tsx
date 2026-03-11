@@ -17,7 +17,7 @@ const SECTIONS = [
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-surface">
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="w-full px-4 py-10">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary mb-6">
           <ArrowLeft className="w-4 h-4" /> Back
         </Link>

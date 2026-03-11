@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Users, MessageSquare, Wallet, User, LogOut, Menu, X, Settings, Clock, ChevronRight } from 'lucide-react';
+import { Home, Calendar, Users, MessageCircle, Wallet, User, LogOut, Menu, X, Settings, Clock, ChevronRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { to: '/appointments', icon: Calendar,       label: 'Appointments' },
   { to: '/schedule',     icon: Clock,          label: 'My Schedule'  },
   { to: '/clients',      icon: Users,          label: 'My Clients'   },
-  { to: '/chats',        icon: MessageSquare,  label: 'Messages'     },
+  { to: '/chats',        icon: MessageCircle,  label: 'Chat'         },
   { to: '/wallet',       icon: Wallet,         label: 'Wallet'       },
   { to: '/profile',      icon: User,           label: 'Profile'      },
   { to: '/settings',     icon: Settings,       label: 'Settings'     },
@@ -20,6 +20,15 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+
+  // Keep scrolling inside the main content area, not the whole page.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
 
   useEffect(() => {
     api.get('/providers/profile')
@@ -45,7 +54,7 @@ export default function DashboardLayout() {
   const profilePic = api.getProfilePicUrl(user?.profile_pic);
 
   return (
-    <div className="min-h-screen bg-surface flex">
+    <div className="h-screen bg-surface flex overflow-hidden">
       {sidebarOpen && <div className="fixed inset-0 bg-black/30 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-primary-dark text-white flex flex-col transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
@@ -111,7 +120,7 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="bg-white border-b border-gray-100 px-4 lg:px-5 h-13 flex items-center justify-between sticky top-0 z-30">
           <button className="lg:hidden p-1" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5 text-gray-600" />
@@ -132,8 +141,10 @@ export default function DashboardLayout() {
           </NavLink>
         </header>
 
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          <Outlet />
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+          <div className="bg-white border border-gray-100 shadow-sm rounded-2xl p-4 lg:p-6 min-h-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -71,7 +71,7 @@ export default function ClientFile() {
   const withNotes = appointments.filter((a) => a.clinical_notes || a.prescription || a.follow_up_notes);
 
   if (!client && appointments.length === 0) return (
-    <div className="max-w-3xl mx-auto text-center py-14">
+    <div className="w-full text-center py-14">
       <User className="w-12 h-12 text-gray-200 mx-auto mb-3" />
       <p className="text-gray-500 font-medium">Patient not found</p>
       <button onClick={() => navigate(-1)} className="mt-3 text-primary text-sm font-medium hover:underline">Go back</button>
@@ -79,7 +79,7 @@ export default function ClientFile() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       {/* Back */}
       <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary mb-5 transition">
         <ArrowLeft className="w-4 h-4" /> My Clients
