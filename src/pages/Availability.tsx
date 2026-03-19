@@ -36,9 +36,9 @@ export default function Availability() {
 
   useEffect(() => {
     api.get('/providers/availability')
-      .then((r) => api.parseResponse<{ data?: { availability?: any[]; minimum_notice_hours?: number } }>(r))
+      .then((r) => api.parseResponse<{ data?: any; minimum_notice_hours?: number }>(r))
       .then((res) => {
-        const avail = res.data?.availability || [];
+        const avail = Array.isArray(res.data?.availability) ? res.data.availability : (Array.isArray(res.data) ? res.data : []);
         if (avail.length > 0) {
           setDays((prev) => {
             const next = prev.map((d) => ({ ...d, slots: [] as TimeSlot[] }));
@@ -57,6 +57,18 @@ export default function Availability() {
                 next[i].slots = [{ start_time: '08:00', end_time: '17:00' }] as TimeSlot[];
               }
             }
+            return next;
+          });
+        } else {
+          // Default: Mon–Fri 8am–5pm when no availability set
+          setDays((prev) => {
+            const next = prev.map((d, i) => {
+              const isWeekday = i >= 1 && i <= 5;
+              return {
+                available: isWeekday,
+                slots: isWeekday ? [{ start_time: '08:00', end_time: '17:00' }] : d.slots,
+              };
+            });
             return next;
           });
         }
