@@ -28,7 +28,13 @@ export default function Login() {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      toast.error(err?.message || 'Login failed');
+      const requiresVerification = err?.data?.data?.requiresVerification || err?.data?.requiresVerification;
+      if (requiresVerification) {
+        toast.error(err?.message || 'Please verify your email to continue.');
+        navigate('/signup');
+      } else {
+        toast.error(err?.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -71,7 +77,12 @@ export default function Login() {
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className={input} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <Link to="/forgot-password" className="text-sm font-medium text-primary hover:text-primary-dark">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" required className={`${input} pr-16`} />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition">

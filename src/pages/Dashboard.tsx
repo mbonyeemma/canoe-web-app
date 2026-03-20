@@ -139,7 +139,7 @@ export default function Dashboard() {
     },
     {
       label: 'Pending Requests',
-      value: loading ? '—' : String(stats.pending_requests),
+      value: loading ? '—' : String(stats.pending_requests ?? 0),
       icon: AlertCircle,
       color: 'bg-amber-50',
       iconColor: 'text-amber-500',

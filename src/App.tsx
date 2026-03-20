@@ -4,6 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import Signup from './pages/Signup';
 import Register from './pages/Register';
 import OtpVerify from './pages/OtpVerify';
@@ -49,6 +50,7 @@ export default function App() {
       {/* Auth pages */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<OtpVerify />} />

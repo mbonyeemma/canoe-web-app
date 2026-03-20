@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Home, Calendar, Users, MessageCircle, Wallet, User, LogOut, Menu, X, Settings, Clock, ChevronRight, Bell, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -89,10 +89,8 @@ export default function DashboardLayout() {
       {sidebarOpen && <div className="fixed inset-0 bg-black/30 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-primary-dark text-white flex flex-col transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        {/* Logo */}
-        <div className="px-4 py-4 flex items-center justify-between border-b border-white/10">
-          <img src="/web_logo.jpeg" alt="Canoe Health" className="h-7 w-auto" />
-          <button className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+        <div className="px-4 py-4 flex items-center justify-end border-b border-white/10 lg:hidden">
+          <button onClick={() => setSidebarOpen(false)}>
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -153,10 +151,14 @@ export default function DashboardLayout() {
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="bg-white border-b border-gray-100 px-4 lg:px-5 h-13 flex items-center justify-between sticky top-0 z-30">
-          <button className="lg:hidden p-1" onClick={() => setSidebarOpen(true)}>
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
-          <div className="hidden lg:block" />
+          <div className="flex items-center gap-3">
+            <button className="lg:hidden p-1" onClick={() => setSidebarOpen(true)}>
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+            <Link to="/dashboard" className="flex items-center shrink-0">
+              <img src="/web_logo.jpeg" alt="Canoe Health" className="h-7 w-auto" />
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <div ref={notifRef} className="relative">
               <button
