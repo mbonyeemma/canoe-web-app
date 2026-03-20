@@ -1,6 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 
-const APP_STORE_URL = 'https://apps.apple.com/app/canoe-health/id000000000';
+const APP_STORE_URL = '#';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.canoehealth.app';
 
 export default function SignupSuccessPatient() {
