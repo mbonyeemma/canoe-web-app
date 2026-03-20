@@ -377,10 +377,16 @@ export default function Signup() {
         { useAuth: true }
       );
       sessionStorage.removeItem(SIGNUP_STATE_KEY);
-      localStorage.setItem('profile_complete', 'true');
-      await refreshProfile();
-      toast.success('Account created!');
-      navigate('/dashboard');
+
+      if (isProvider) {
+        localStorage.setItem('profile_complete', 'true');
+        await refreshProfile();
+        toast.success('Account created!');
+        navigate('/dashboard');
+      } else {
+        api.triggerLogout();
+        navigate('/signup-success-patient');
+      }
     } catch (err: any) {
       toast.error(err?.message || 'Signup failed');
     } finally {

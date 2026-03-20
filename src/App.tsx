@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Signup from './pages/Signup';
+import SignupSuccessPatient from './pages/SignupSuccessPatient';
 import Register from './pages/Register';
 import OtpVerify from './pages/OtpVerify';
 import PersonalDetails from './pages/PersonalDetails';
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/signup-success-patient" element={<SignupSuccessPatient />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<OtpVerify />} />
         <Route path="/personal-details" element={<PersonalDetails />} />
